@@ -20,6 +20,8 @@ RSpec.describe Library do
     expect(dpl.name).to eq('Denver Public Library')
     expect(dpl.books).to eq([])
     expect(dpl.authors).to eq([])
+    expect(dpl.checked_out_books).to eq([])
+    expect(dpl.books_with_checkout_count).to eq({})
   end
   
   it "#add_author method adds authors and books to attributes" do
@@ -49,5 +51,67 @@ RSpec.describe Library do
     result = {start: '1960', end: '1960'}
     expect(dpl.publication_time_frame_for(harper_lee)).to eq(result)
   end
+  
+  it "checkout returns boolean value" do
+    jane_eyre = charlotte_bronte.write("Jane Eyre", "October 16, 1847")
+    professor = charlotte_bronte.write("The Professor", "1857")
+    villette = charlotte_bronte.write("Villette", "1853")
+    mockingbird = harper_lee.write("To Kill a Mockingbird", "July 11, 1960")
+    expect(dpl.checkout(mockingbird)).to eq(false)
+    expect(dpl.checkout(jane_eyre)).to eq(false)
+    
+    dpl.add_author(charlotte_bronte)
+    dpl.add_author(harper_lee)
+    
+    # Book checkout
+    expect(dpl.checkout(jane_eyre)).to eq(true)
+    expect(dpl.checked_out_books).to eq([jane_eyre])
+    expect(dpl.checkout(jane_eyre)).to eq(false)
+  end
+  
+  it "#return book returns a book" do
+    jane_eyre = charlotte_bronte.write("Jane Eyre", "October 16, 1847")
+    professor = charlotte_bronte.write("The Professor", "1857")
+    villette = charlotte_bronte.write("Villette", "1853")
+    mockingbird = harper_lee.write("To Kill a Mockingbird", "July 11, 1960")
+    dpl.add_author(charlotte_bronte)
+    dpl.add_author(harper_lee)
+    
+    dpl.checkout(jane_eyre)
+    # Book return
+    dpl.return(jane_eyre)
+    expect(dpl.checked_out_books).to eq([])
+    
+  end
+  
+  it "#most_popular_book returns the books checked out the most" do
+    jane_eyre = charlotte_bronte.write("Jane Eyre", "October 16, 1847")
+    professor = charlotte_bronte.write("The Professor", "1857")
+    villette = charlotte_bronte.write("Villette", "1853")
+    mockingbird = harper_lee.write("To Kill a Mockingbird", "July 11, 1960")
+    dpl.add_author(charlotte_bronte)
+    dpl.add_author(harper_lee)
+    
+    dpl.checkout(jane_eyre)
+    dpl.checkout(villette)
+    dpl.checkout(mockingbird)
+    dpl.return(mockingbird)
+    dpl.checkout(mockingbird)
+    dpl.return(mockingbird)
+    dpl.checkout(mockingbird)
+    expect(dpl.most_popular_book).to eq(mockingbird)
+  end
+end  
 
-end
+
+
+
+
+
+
+
+
+
+
+
+
